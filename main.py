@@ -18,16 +18,16 @@ asus = {
 my_pc = Computer(**asus)
 
 class Numbers(BaseModel):
-    num1: int =6
-    num2: int =6
+    num1: float =6
+    num2: float =6
 
 ##########################################################################
 
-app = FastAPI()
+app = FastAPI(description="API di prova per studiare FastAPI", title="Imparare API")
 
 @app.get("/")
 def hello():
-    return "http://localhost:8000/docs"
+    return "<-----------      http://localhost:8000/docs     ---------->"
 
 @app.get("/pc")
 def computer(pc: Computer= asus):
@@ -44,7 +44,7 @@ async def sum_numbers(numbers: Numbers):
         res = numbers.num1 + numbers.num2
         return res
     except:
-        return {'error': 'something went wrong'}
+        return {'result': 'errore' }
 # @app.get("/inventory")
 # def inventory():
 #     return inventory
