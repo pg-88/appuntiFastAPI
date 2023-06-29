@@ -1,21 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 import uvicorn
 from pydantic import BaseModel
+from fastapi.templating import Jinja2Templates
 
 #####################DATI#################################################
-
-
-class Computer(BaseModel):
-    cpu: str
-    freq: int
-
-
-asus = {
-    "cpu" : 'ryzen7',
-    "freq": 2500000
-}
-
-my_pc = Computer(**asus)
 
 class Numbers(BaseModel):
     num1: float =6
@@ -23,15 +11,13 @@ class Numbers(BaseModel):
 
 ##########################################################################
 
-app = FastAPI(description="API di prova per studiare FastAPI", title="Imparare API")
+app = FastAPI(description="API di prova per studiare approfondire Jinja", title="Test Jinja")
+
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 def hello():
     return "<-----------      http://localhost:8000/docs     ---------->"
-
-@app.get("/pc")
-def computer(pc: Computer= asus):
-    return{pc.cpu: pc.freq}
 
 @app.get("/sum")
 def sum_numbers(numbers: Numbers= Depends()):
@@ -45,9 +31,8 @@ async def sum_numbers(numbers: Numbers):
         return res
     except:
         return {'result': 'errore' }
-# @app.get("/inventory")
-# def inventory():
-#     return inventory
+
+
 
 
 
