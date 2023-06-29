@@ -1,55 +1,54 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status
 import uvicorn
 from pydantic import BaseModel
+import joblib
 
 #####################DATI#################################################
 
-
-class Computer(BaseModel):
-    cpu: str
-    freq: int
-
-
-asus = {
-    "cpu" : 'ryzen7',
-    "freq": 2500000
-}
-
-my_pc = Computer(**asus)
-
-class Numbers(BaseModel):
-    num1: int =6
-    num2: int =6
+# struttura dati che ricalca gli input necessari al modello
+class ModelInput(BaseModel):
+    tv: float = 147.042 # default il vslore medio
+    radio: float = 23.26 # default il vslore medio
+    newspaper: float = 30.55 # default il vslore medio
 
 ##########################################################################
 
-app = FastAPI()
+app = FastAPI(title='Sales API', description='genera previsioni di future vendite sfruttando il modello. Autore Pietro Griolo')
+
+# caricare il modello come var globale all'avvio del servizio
+@app.on_event("startup")
+def on_startup():
+    global model
+    with open('sales.pkl', 'rb') as pickle:
+        model = joblib.load(pickle)
+        print('Caricsto il modello')
+
+    return model
+
 
 @app.get("/")
 def hello():
-    return "http://localhost:8000/docs"
+    return {"<----     http://localhost:8000/docs     ------>"}
 
-@app.get("/pc")
-def computer(pc: Computer= asus):
-    return{pc.cpu: pc.freq}
+# chiamata GET
+@app.get("/sales")
+async def get_sales(in_data: ModelInput=Depends()):
+    X = [[in_data.tv, in_data.radio, in_data.newspaper]]
+    sales = model.predict(X)[0]
+    print(sales)
+    
+    return {"Sales": sales}
 
-@app.get("/sum")
-def sum_numbers(numbers: Numbers= Depends()):
-    sum = int(numbers.num1 + numbers.num2)
-    return sum
-
-@app.post("/sum")
-async def sum_numbers(numbers: Numbers):
-    try:
-        res = numbers.num1 + numbers.num2
-        return res
-    except:
-        return {'error': 'something went wrong'}
-# @app.get("/inventory")
-# def inventory():
-#     return inventory
-
-
+# chiamata POST
+@app.post("/sales")
+async def post_sales(in_data: ModelInput):
+    pass
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+'''
+################# to do #####################
+Usare dotenv per indirizzi (base URL) e nomi files
+
+'''
