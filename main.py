@@ -27,27 +27,8 @@ app = FastAPI(description="API di prova per studiare FastAPI", title="Imparare A
 
 @app.get("/")
 def hello():
-    return "<-----------      http://localhost:8000/docs     ---------->"
+    return {"<-----------      http://localhost:8000/docs     ---------->"}
 
-@app.get("/pc")
-def computer(pc: Computer= asus):
-    return{pc.cpu: pc.freq}
-
-@app.get("/sum")
-def sum_numbers(numbers: Numbers= Depends()):
-    sum = int(numbers.num1 + numbers.num2)
-    return sum
-
-@app.post("/sum")
-async def sum_numbers(numbers: Numbers):
-    try:
-        res = numbers.num1 + numbers.num2
-        return res
-    except:
-        return {'result': 'errore' }
-# @app.get("/inventory")
-# def inventory():
-#     return inventory
 
 
 
